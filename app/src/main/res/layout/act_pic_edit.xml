@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <include layout="@layout/ly_action_bar"/>
+
+    <EditText
+        android:id="@+id/etInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="180dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:hint="请输入内容"
+        android:gravity="left"
+        android:background="@drawable/shape_rect_bg_gray"
+        android:padding="10dp"
+        />
+
+    <ImageView
+        android:id="@+id/imgCheck"
+        android:layout_width="@dimen/imgSize"
+        android:layout_height="@dimen/imgSize"
+        android:src="@mipmap/ic_camera"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        />
+    <Button
+        android:id="@+id/btnSub"
+        style="@style/styleBtnSub"
+        android:text="保存"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        />
+
+
+
+</LinearLayout>
