@@ -15,17 +15,20 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory;
 import com.melnykov.fab.FloatingActionButton;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -33,10 +36,15 @@ import java.util.TimerTask;
 
 import butterknife.BindView;
 import de.hdodenhof.circleimageview.CircleImageView;
+import rx.Observable;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
+
 import com.qi.newselect.base.BaseActivity;
 import com.qi.newselect.edit.EditAct;
 import com.qi.newselect.top_frag.TopFragment;
 import com.qi.newselect.utils.EventMsg;
+import com.qi.newselect.utils.FileUtils;
 import com.qi.newselect.utils.LogUtil;
 import com.qi.newselect.utils.ToastUtil;
 import com.qi.newselect.utils.UserUtils;
@@ -92,6 +100,7 @@ public class MainActivity extends BaseActivity<IMain,MainPresenter> implements  
         initTab();
         initViewPager();
 
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,6 +148,32 @@ public class MainActivity extends BaseActivity<IMain,MainPresenter> implements  
                     case R.id.menu_info:
                         Snackbar.make(nav_view,"个人信息", Snackbar.LENGTH_SHORT).show();
                         break;
+                    case R.id.nav_cache:
+                        Observable.create(new Observable.OnSubscribe<Integer>() {
+                            @Override
+                            public void call(Subscriber<? super Integer> subscriber) {
+                                subscriber.onNext(1);
+                                subscriber.onCompleted();
+                            }
+                        }).subscribeOn(Schedulers.newThread()).observeOn(Schedulers.newThread())
+                        .subscribe(new Subscriber<Integer>() {
+                            @Override
+                            public void onCompleted() {
+                                showCacheSize();
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(Integer integer) {
+                                Glide.get(MainActivity.this).clearDiskCache();
+                            }
+                        });
+
+                        break;
                     default:
                         closeDrawer();
                         break;
@@ -149,8 +184,21 @@ public class MainActivity extends BaseActivity<IMain,MainPresenter> implements  
             }
         });
 
+        showCacheSize();
 
+    }
 
+    private void showCacheSize() {
+        try {
+            long s = FileUtils.getFolderSize(new File(getCtx().getCacheDir()
+                    + "/"+ InternalCacheDiskCacheFactory.DEFAULT_DISK_CACHE_DIR));
+            String str = FileUtils.getFormatSize(s);
+            Menu navMenu =  nav_view.getMenu();
+            navMenu.getItem(3).setTitle(" 缓存大小 ");
+            navMenu.findItem(R.id.nav_cache).setTitle("点击此处清除 "+str);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void initActionBar() {

@@ -99,7 +99,8 @@ public class RegisterAct extends BaseActivity<IRegister, RegisterPresenter> impl
         imgHead.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PermissionsUtil.requestPermissions(RegisterAct.this, null, REQUEST_CODE_PIC,
+                PermissionsUtil.requestPermissions(RegisterAct.this, null
+                        , PermissionsUtil.REQUEST_CAMERA,
                         Manifest.permission.CAMERA, new PermissionsUtil.OnPermissionListener() {
                             @Override
                             public void onPermissionAllow() {

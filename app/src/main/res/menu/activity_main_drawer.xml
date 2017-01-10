@@ -18,4 +18,12 @@
         </menu>
     </item>
 
+    <item android:title="缓存">
+        <menu>
+            <item
+                android:id="@+id/nav_cache"
+                android:title="清除" />
+        </menu>
+    </item>
+
 </menu>
