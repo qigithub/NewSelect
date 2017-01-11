@@ -26,4 +26,8 @@
         </menu>
     </item>
 
+    <item
+        android:id="@+id/nav_float"
+        android:title="显示浮动按钮" />
+
 </menu>

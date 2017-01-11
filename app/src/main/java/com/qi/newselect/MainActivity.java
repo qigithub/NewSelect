@@ -1,7 +1,11 @@
 package com.qi.newselect;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -20,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory;
@@ -42,6 +47,7 @@ import rx.schedulers.Schedulers;
 
 import com.qi.newselect.base.BaseActivity;
 import com.qi.newselect.edit.EditAct;
+import com.qi.newselect.service.FxService;
 import com.qi.newselect.top_frag.TopFragment;
 import com.qi.newselect.utils.EventMsg;
 import com.qi.newselect.utils.FileUtils;
@@ -81,6 +87,11 @@ public class MainActivity extends BaseActivity<IMain,MainPresenter> implements  
 
     MainVpAdapter mFragAdapter;
 
+    Intent intentSe;
+
+
+
+    public static final int OVERLAY_PERMISSION_REQ_CODE = 10;
     @Override
     protected MainPresenter createPresenter() {
         return new MainPresenter(this);
@@ -99,7 +110,7 @@ public class MainActivity extends BaseActivity<IMain,MainPresenter> implements  
         initNavLayout();
         initTab();
         initViewPager();
-
+        intentSe = new Intent(MainActivity.this, FxService.class);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -173,6 +184,9 @@ public class MainActivity extends BaseActivity<IMain,MainPresenter> implements  
                             }
                         });
 
+                        break;
+                    case R.id.nav_float:
+                        askForPermission();
                         break;
                     default:
                         closeDrawer();
@@ -326,5 +340,30 @@ public class MainActivity extends BaseActivity<IMain,MainPresenter> implements  
     }
 
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+                Toast.makeText(getCtx(), "权限授予失败，无法开启悬浮窗", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getCtx(), "权限授予成功！", Toast.LENGTH_SHORT).show();
+                //启动FxService
+                startService(intentSe);
+            }
+
+        }
+    }
+    /**
+     * 请求用户给予悬浮窗的权限
+     */
+    public void askForPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            Toast.makeText(getCtx(), "当前无权限，请授权！", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+        } else {
+            startService(intentSe);
+        }
+    }
 
 }
