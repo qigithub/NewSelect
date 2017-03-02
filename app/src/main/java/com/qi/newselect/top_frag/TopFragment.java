@@ -75,12 +75,13 @@ public class TopFragment extends BaseFragment<ITopFrag,TopPresenter> implements 
                 super.onScrolled(recyclerView, dx, dy);
 
                 LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-
                 int totalItemCount = layoutManager.getItemCount();
-
+                if (totalItemCount < 10)
+                    return;
+                //获取最后一个不完全可见的item的position
                 int lastVisibleItem = layoutManager.findLastVisibleItemPosition();
 
-                if (!isLoading && totalItemCount < (lastVisibleItem + 3)) {
+                if (!isLoading ) {
                     isLoading = true;
                     if (list != null && list.size() > 0) {
                         list.add(null);
@@ -96,14 +97,17 @@ public class TopFragment extends BaseFragment<ITopFrag,TopPresenter> implements 
                         public void run() {
                             if (list.size() == 0) {
 //                                list.addAll(list);
+                                int oldSize = list.size();
                                 list.add(new TopBean("0","more 1","aaaa"));
-                                mAdapter.notifyDataSetChanged();
+                                mAdapter.notifyItemRangeChanged(oldSize,list.size());
                             } else {
+                                int oldSize = list.size()-1;
                                 //删除 footer
                                 list.remove(list.size() - 1);
 //                                list.addAll(list);
                                 list.add(new TopBean("0","more 1","aaaa"));
-                                mAdapter.notifyDataSetChanged();
+                                list.add(new TopBean("0","more 2","aaaa"));
+                                mAdapter.notifyItemRangeChanged(oldSize,list.size());
                                 isLoading = false;
                             }
                         }
