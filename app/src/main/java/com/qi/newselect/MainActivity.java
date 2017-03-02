@@ -115,6 +115,7 @@ public class MainActivity extends BaseActivity<IMain,MainPresenter> implements  
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                Glide.with(getCtx()).load("").asBitmap();
                 BaseActivity.launchAct(getCtx(), EditAct.class);
             }
         });
@@ -205,8 +206,8 @@ public class MainActivity extends BaseActivity<IMain,MainPresenter> implements  
     private void showCacheSize() {
         try {
             long s = FileUtils.getFolderSize(new File(getCtx().getCacheDir()
-                    + "/"+ InternalCacheDiskCacheFactory.DEFAULT_DISK_CACHE_DIR));
-            String str = FileUtils.getFormatSize(s);
+                    + File.separator+ InternalCacheDiskCacheFactory.DEFAULT_DISK_CACHE_DIR));
+            String str = FileUtils.formatSize(s);
             Menu navMenu =  nav_view.getMenu();
             navMenu.getItem(3).setTitle(" 缓存大小 ");
             navMenu.findItem(R.id.nav_cache).setTitle("点击此处清除 "+str);
@@ -231,6 +232,7 @@ public class MainActivity extends BaseActivity<IMain,MainPresenter> implements  
         });
         LogUtil.d(TAG,""+UserUtils.getImg(getApplicationContext()));
         Glide.with(getCtx()).load(UserUtils.getImg(getApplicationContext()))
+
                 .dontTransform()
                 .dontAnimate()
                 .error(R.mipmap.ic_user_def)

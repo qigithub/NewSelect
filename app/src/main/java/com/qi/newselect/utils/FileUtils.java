@@ -30,7 +30,7 @@ public class FileUtils {
     }
 
     // 格式化单位
-    public static String getFormatSize(long size) {
+    public static String formatSize(long size) {
         double kiloByte = size / 1024;
         if (kiloByte < 1) {
             return size + "Byte";

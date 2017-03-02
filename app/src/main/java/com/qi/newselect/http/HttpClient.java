@@ -35,31 +35,34 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
  */
 public class HttpClient {
     private static final String TAG = "HttpClient";
-    Retrofit retrofit;
-
+    private Retrofit retrofit;
+    private OkHttpClient okHttpClient;
     private static HttpClient httpClient;
-
+    private String baseUrl;
+    private Context context;
     /**
      * url没更换的话用这个
+     *
      * @param baseUrl
      * @return
      */
     public static HttpClient getInstance(String baseUrl, Context context) {
-        if (baseUrl ==null || "".equals(baseUrl)){
-            Log.e(TAG, " getInstance:  baseurl is null" );
+        if (baseUrl == null || "".equals(baseUrl)) {
+            Log.e(TAG, " getInstance:  baseurl is null");
         }
         if (httpClient == null) {
-            synchronized (HttpClient.class) {
-                if (httpClient == null) {
-                    httpClient = new HttpClient(baseUrl, context);
-                }
-            }
+//            synchronized (HttpClient.class) {
+//                if (httpClient == null) {
+            httpClient = new HttpClient(baseUrl, context);
+//                }
+//            }
         }
         return httpClient;
     }
 
     /**
      * url有更换的话用这个
+     *
      * @param baseUrl
      * @param context
      * @return
@@ -69,81 +72,51 @@ public class HttpClient {
     }
 
     public HttpClient(String baseUrl, final Context context) {
+        this.baseUrl = baseUrl;
+        this.context = context;
         try {
-            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            Interceptor mInterceptor = new Interceptor() {
-                @Override
-                public Response intercept(Chain chain) throws IOException {
-                    Request request = chain.request();
-                    if (!HttpUtils.isNetworkReachable(context)) {
-                        request = request.newBuilder()
-                                .cacheControl(CacheControl.FORCE_CACHE)
-                                .build();
-                    }
-                    return chain.proceed(request);
-
-                }
-            };
-
-
-            Cache cache = new Cache(context.getCacheDir(), 10 * 1024 * 1024);
-
-            OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .connectTimeout(10_000, TimeUnit.MILLISECONDS)
-                    .addInterceptor(interceptor)
-                    .addInterceptor(mInterceptor)
-                    .addNetworkInterceptor(getNetWorkInterceptor(context))
-                    .cache(cache)
-                    .build();
-
-
-//            TrustManager[] trustManager = new TrustManager[]{
-//                    new X509TrustManager() {
-//                        @Override
-//                        public void checkClientTrusted(X509Certificate[] chain, String authType) throws
-//                                CertificateException {
-//                        }
-//
-//                        @Override
-//                        public void checkServerTrusted(X509Certificate[] chain, String authType) throws
-//                                CertificateException {
-//                        }
-//
-//                        @Override
-//                        public X509Certificate[] getAcceptedIssuers() {
-//                            return null;    // 返回null
-//                        }
-//                    }
-//            };
-//            try {
-//                SSLContext sslContext = SSLContext.getInstance("SSL");
-//                sslContext.init(null, trustManager, new SecureRandom());
-//                SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
-//                okHttpClient.setSslSocketFactory(sslSocketFactory);
-//                okHttpClient.sslSocketFactory().createSocket()
-//                okHttpClient.setHostnameVerifier(new HostnameVerifier() {
-//                    @Override
-//                    public boolean verify(String hostname, SSLSession session) {
-//                        return hostname.contains("192.168.6.41");
-//                    }
-//                });
-//            } catch (NoSuchAlgorithmException e) {
-//                e.printStackTrace();
-//            } catch (KeyManagementException e) {
-//                e.printStackTrace();
-//            }
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(baseUrl)
-    //                .addConverterFactory(GsonConverterFactory.create())
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .addConverterFactory(JacksonConverterFactory.create())
-                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                    .client(okHttpClient)
-                    .build();
+            initOkHttp();
+            initRetrofit();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void initOkHttp() {
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        Interceptor mInterceptor = new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request request = chain.request();
+                if (!HttpUtils.isNetworkReachable(context)) {
+                    request = request.newBuilder()
+                            .cacheControl(CacheControl.FORCE_CACHE)
+                            .build();
+                }
+                return chain.proceed(request);
+
+            }
+        };
+
+        Cache cache = new Cache(context.getCacheDir(), 10 * 1024 * 1024);
+        okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(10_000, TimeUnit.MILLISECONDS)
+                .addInterceptor(interceptor)
+                .addInterceptor(mInterceptor)
+                .addNetworkInterceptor(getNetWorkInterceptor(context))
+                .cache(cache)
+                .build();
+    }
+    private void initRetrofit() {
+        retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                // .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(JacksonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(okHttpClient)
+                .build();
     }
 
     /**
@@ -152,6 +125,12 @@ public class HttpClient {
      * @return
      */
     public <T> T createService(Class<T> cls) {
+        if (retrofit == null) {
+            if (okHttpClient == null) {
+                initOkHttp();
+            }
+            initRetrofit();
+        }
         return retrofit.create(cls);
     }
 

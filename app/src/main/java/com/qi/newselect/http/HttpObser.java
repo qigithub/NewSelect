@@ -39,12 +39,12 @@ public class HttpObser<T> {
 
     public Subscription getSubscription(final Context appCtx, final Observable<T> o
             , final OnRetrofitListener listener) {
-        return o.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        return o
+                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .unsubscribeOn(Schedulers.io())
                 .subscribe(new Subscriber<T>() {
                     @Override
                     public void onCompleted() {
-
                     }
 
                     @Override
@@ -118,7 +118,7 @@ public class HttpObser<T> {
      * @param listener
      * @return
      */
-    public Subscription getSubscriptionUp( final Observable<T> o,final Context appCtx
+    public Subscription getSubscriptUp( final Observable<T> o,final Context appCtx
             , final OnRetrofitListener listener) {
         return o.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<T>() {
@@ -194,14 +194,6 @@ public class HttpObser<T> {
         void onErrCode(String jsonStr);
 
         void onProgressHide();
-    }
-
-    public interface OnRetrofitCallBack<T> {
-        void onSuccess(T t);
-
-        void onFailure(Throwable e);
-
-        void onErrCode(String jsonStr);
     }
 
 

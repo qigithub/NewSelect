@@ -24,6 +24,9 @@ public class LauncherAct extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        TestProxy testProxy = new TestProxy();
+        testProxy.main();
         PermissionsUtil.requestPermissions(LauncherAct.this, null, 0, Manifest.permission.WRITE_EXTERNAL_STORAGE
                 , new PermissionsUtil.OnPermissionListener() {
                     @Override
@@ -53,11 +56,11 @@ public class LauncherAct extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Long>() {
             @Override
             public void call(Long aLong) {
-                if (UserUtils.getToken(getApplicationContext()) == null || "".equals(UserUtils.getToken(getApplicationContext()))) {
-                    BaseActivity.launchAct(LauncherAct.this, LoginAct.class);
-                } else {
+//                if (UserUtils.getToken(getApplicationContext()) == null || "".equals(UserUtils.getToken(getApplicationContext()))) {
+//                    BaseActivity.launchAct(LauncherAct.this, LoginAct.class);
+//                } else {
                     BaseActivity.launchAct(LauncherAct.this, MainActivity.class);
-                }
+//                }
                 finish();
             }
         });

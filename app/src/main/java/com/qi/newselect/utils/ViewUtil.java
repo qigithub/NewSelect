@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.Toast;
@@ -31,7 +32,7 @@ public class ViewUtil {
      * @return
      */
 
-    public static void createLoadingDialog(@NonNull final Activity context, @NonNull String msg, boolean flag) {
+    public static void createLoadingDialog(@NonNull final Activity context, @Nullable String msg, boolean flag) {
         if (context == null) {
             LogUtil.i(context.getClass().getSimpleName(), " pushSS createLoadingDialog context is null ");
             return;
@@ -41,13 +42,15 @@ public class ViewUtil {
         }
 
         loadingDialog = new ProgressDialog(context);
-        loadingDialog.setTitle(msg);
+        if (msg == null) {
+            loadingDialog.setTitle("loading...");
+        } else {
+            loadingDialog.setTitle(msg);
+        }
         //true可以点击别处或者返回键取消
         //false不可取消
         loadingDialog.setCancelable(flag);// 不可以用“返回键”取消
         loadingDialog.show();
-        LogUtil.i("pushSS", System.currentTimeMillis() + " 推送加载 进度条 ");
-
     }
 
     public static void showToast(Context con, String content) {
