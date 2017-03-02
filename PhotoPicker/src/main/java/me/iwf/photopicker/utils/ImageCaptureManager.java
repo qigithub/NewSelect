@@ -31,7 +31,7 @@ public class ImageCaptureManager {
     this.mContext = mContext;
   }
 
-  private File createImageFile() throws IOException {
+  public File createImageFile() throws IOException {
     // Create an image file name
     String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     String imageFileName = "JPEG_" + timeStamp + "_";
@@ -65,7 +65,7 @@ public class ImageCaptureManager {
       // Continue only if the File was successfully created
       if (photoFile != null) {
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-            Uri.fromFile(photoFile));
+            FileUtils.getUriForFile(mContext,photoFile));
       }
     }
     return takePictureIntent;

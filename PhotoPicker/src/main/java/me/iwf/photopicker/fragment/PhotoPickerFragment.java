@@ -30,6 +30,7 @@ import me.iwf.photopicker.adapter.PopupDirectoryListAdapter;
 import me.iwf.photopicker.entity.Photo;
 import me.iwf.photopicker.entity.PhotoDirectory;
 import me.iwf.photopicker.event.OnPhotoClickListener;
+import me.iwf.photopicker.utils.FileUtils;
 import me.iwf.photopicker.utils.ImageCaptureManager;
 import me.iwf.photopicker.utils.MediaStoreHelper;
 import me.iwf.photopicker.utils.PermissionsUtil;
@@ -170,6 +171,9 @@ public class PhotoPickerFragment extends Fragment {
                             @Override
                             public void onPermissionAllow() {
                                 try {
+//                                    FileUtils.startActionCapture(getActivity(),
+//                                            captureManager.createImageFile(),
+//                                            ImageCaptureManager.REQUEST_TAKE_PHOTO);
                                     Intent intent = captureManager.dispatchTakePictureIntent();
                                     startActivityForResult(intent, ImageCaptureManager.REQUEST_TAKE_PHOTO);
                                 } catch (IOException e) {
